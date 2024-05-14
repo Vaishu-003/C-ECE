@@ -1,0 +1,50 @@
+/* pass 2 of macro processor*/
+#include<stdio.h>
+void main()
+{
+	int j=0,k;
+	char mname[10],word[20];
+	FILE *fop,*fmnt,*fmdt,*fir;
+	fop=fopen("output.dat","w");		//open output
+	fmnt=fopen("mnt.dat","r");		//open mnt table
+	fmdt=fopen("mdt.dat","r");		//open mdt table
+	fir=fopen("ir.dat","r");		//Intermediate representation
+	while(!feof(fir))
+	{
+		rewind(fmnt);			//restart mnt table
+		fgets(word,20,fir);		//read instruction
+		fscanf(fmnt,"%d",&k);		//ignore number
+		while(!feof(fmnt))
+		{		// check if instruction is name of any macro
+			fgets(mname,20,fmnt);
+			if(!strcmp(word,mname))
+			{
+				j=1;
+				break;		//found macro call
+			}
+			fscanf(fmnt,"%d",&k);		//again ignore number
+		}
+		if(j==1)
+		{			
+			j=0;
+			fscanf(fmdt,"%s",mname);	
+			while(strcmp(word,mname))
+			{		//search same macro name in MDT
+				fgets(mname,20,fmdt);
+				fscanf(fmdt,"%d",k);		
+			}
+			fgets(word,20,fmdt);
+			while(strcmp(word," MEND\n"))
+			{		//found in MDT now copy definition of macro
+				fprintf(fop,"%s",word);
+				fscanf(fmdt,"%d",&k);
+				fgets(word,20,fmdt);
+			}
+		}
+		Else			//no macro paste as it is in output
+			fprintf(fop,"%s",word);
+		}
+		printf("action taken");
+		getch();
+
+}
